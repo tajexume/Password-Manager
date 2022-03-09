@@ -8,6 +8,7 @@ numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
 
 def genpass():
+  ###Generates a random password
   password_list = []
   new_password = ''
   nr_letters = random.randint(8,10)
@@ -30,11 +31,12 @@ def genpass():
     new_password += char
   gen_password.delete(0,END)
   gen_password.insert(END,  string=f'{new_password}')
-  pyperclip.copy(new_password)
+  pyperclip.copy(new_password)      #Copies to clipboard
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 websites = {"Websites": {"Username": "Password"}}
 def save():
+  #Saves password information to a doc called 'Password Saves.txt'
   save_website = str(website_answer.get())
   save_username = str(user_answer.get())
   save_password = str(gen_password.get())
@@ -49,6 +51,9 @@ def save():
     messagebox.showinfo(title="Missing Input", message='Please be sure to fill all categories!')
   with open("Password Saves.txt",'w') as file:
     file.write(str(websites))
+  gen_password.delete(0,END)
+  user_answer.delete(0,END)
+  website_answer.delete(0,END)
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
 window.title("Password Manager")
