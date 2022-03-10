@@ -3,6 +3,7 @@ import random
 from tkinter import *
 from tkinter import messagebox
 import pyperclip
+import json
 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
@@ -34,26 +35,34 @@ def genpass():
   pyperclip.copy(new_password)      #Copies to clipboard
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
-websites = {"Websites": {"Username": "Password"}}
 def save():
   #Saves password information to a doc called 'Password Saves.txt'
   save_website = str(website_answer.get())
   save_username = str(user_answer.get())
   save_password = str(gen_password.get())
+  websites = {save_website: {"Username": save_username, "Password": save_password}}
   is_ok = messagebox.askokcancel(title=save_website, message=f"Is this info correct?:\nWebsite: {save_website} " f"\nUsername: {save_username}" f"\nPassword: {save_password}")
   if is_ok is True and (len(save_password) != 0 and len(save_username) != 0 and len(save_website) != 
  0):
-    if save_website in websites:
-      websites[save_website][save_username] = save_password
+    try:
+      with open('Password Saves.json', 'r') as passFile:
+        password_data = json.load(passFile)
+    except FileNotFoundError:
+      with open('Password Saves.json', 'w') as passFile:
+        json.dump(websites, passFile, indent=4)
     else:
-      websites[save_website] = {save_username: save_password}
+      password_data.update(websites)
+      with open('Password Saves.json', 'w') as passFile:
+        json.dump(password_data, passFile, indent=4)
+    finally:
+      gen_password.delete(0,END)
+      user_answer.delete(0,END)
+      website_answer.delete(0,END)
+  elif is_ok == False:
+    pass
   else:
-    messagebox.showinfo(title="Missing Input", message='Please be sure to fill all categories!')
-  with open("Password Saves.txt",'w') as file:
-    file.write(str(websites))
-  gen_password.delete(0,END)
-  user_answer.delete(0,END)
-  website_answer.delete(0,END)
+    messagebox.showinfo(title="Missing Input", message='Please be sure to fill all fields')
+  
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
 window.title("Password Manager")
