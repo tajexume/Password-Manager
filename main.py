@@ -37,9 +37,9 @@ def genpass():
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 def save():
   #Saves password information to a doc called 'Password Saves.txt'
-  save_website = str(website_answer.get())
-  save_username = str(user_answer.get())
-  save_password = str(gen_password.get())
+  save_website = website_answer.get()
+  save_username = user_answer.get()
+  save_password = gen_password.get()
   websites = {save_website: {"Username": save_username, "Password": save_password}}
   is_ok = messagebox.askokcancel(title=save_website, message=f"Is this info correct?:\nWebsite: {save_website} " f"\nUsername: {save_username}" f"\nPassword: {save_password}")
   if is_ok is True and (len(save_password) != 0 and len(save_username) != 0 and len(save_website) != 
@@ -62,7 +62,21 @@ def save():
     pass
   else:
     messagebox.showinfo(title="Missing Input", message='Please be sure to fill all fields')
-  
+
+# ---------------------------- Search Password ------------------------ #
+def search():
+  return_site = website_answer.get()
+  if len(website_answer.get()) !=0:
+    try:
+      with open('Password Saves.json', 'r') as passFile:
+        passData = json.load(passFile)
+        messagebox.showinfo(title=f'{return_site}', message=f'Username: {passData[return_site]["Username"]}\nPassword: {passData[return_site]["Password"]}')
+    except FileNotFoundError:
+      messagebox.showinfo(title='No Saves', message='You have no saved passwords.')
+    except KeyError:
+      messagebox.showinfo(title='Not Found', message='There are no passwords for this site.')
+  else:
+    messagebox.showinfo(title='No Website',message='No website has been entered.')
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
 window.title("Password Manager")
@@ -73,8 +87,8 @@ canvas.create_image(150,100, image=logo)
 canvas.grid(column=1,row=0)
 website = Label(text="Website:")
 website.grid(column=0,row=1)
-website_answer = Entry(width=35)
-website_answer.grid(column=1,row=1,columnspan=2)
+website_answer = Entry(width=21)
+website_answer.grid(column=1,row=1)
 user = Label(text='Email/Username:')
 user_answer = Entry(width=35)
 user.grid(column=0,row=2)
@@ -87,4 +101,6 @@ passgen = Button(text='Generate Password', command=genpass,width=12)
 passgen.grid(column=2,row=3)
 add = Button(text='Add', command=save, width=36)
 add.grid(column=1,row=4,columnspan=2)
+find = Button(text='Search', command=search)
+find.grid(column=2,row=1)
 window.mainloop()
